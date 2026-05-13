@@ -22,7 +22,7 @@ CREATE TABLE raw_data (
 
 SELECT COUNT(*) FROM raw_data;
 
-SELECT * FROM raw_data LIMIT 10;
+SELECT * FROM raw_data;
 
 -- ============================================
 -- DATA QUALITY CHECKS
@@ -59,7 +59,7 @@ LIMIT 10;
 --Check 3: True duplicates checking
 SELECT order_id, product_id, product_name, price, quantity
 FROM raw_data
-WHERE order_id = 1234
+WHERE order_id = 2363
 LIMIT 10;
 
 SELECT 
@@ -158,25 +158,6 @@ GROUP BY payment_method
 ORDER BY count DESC;
    
 
--- ============================================
--- CREATE CLEANED TABLE
--- ============================================
-
-CREATE TABLE cleaned_data AS
-SELECT 
-    order_id,
-    user_id,
-    product_id,
-    product_name,
-    category,
-    price,
-    quantity,
-    event_type,
-    timestamp,
-    payment_method,
-    city,
-    price * quantity AS revenue
-FROM raw_data;
 
 
 -- ============================================
