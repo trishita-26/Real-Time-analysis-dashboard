@@ -2,7 +2,7 @@
 -- REAL TIME ANALYSIS DASHBOARD
 -- SQL Cleaning Script
 -- ============================================
-
+DROP TABLE IF EXISTS raw_data;
 -- Step 1: Create raw_data table
 CREATE TABLE raw_data (
     id             SERIAL PRIMARY KEY,

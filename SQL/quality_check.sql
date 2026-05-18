@@ -105,10 +105,10 @@ CASE
     WHEN city IS NULL
          OR TRIM(city) = ''
          OR LOWER(TRIM(city)) = 'null'
-    THEN 'Unknown'
+    THEN 'Others'
 
     WHEN city LIKE '%?%'
-    THEN 'Unknown'
+    THEN 'Others'
 
     WHEN LOWER(TRIM(city)) IN (
         'del',
@@ -181,7 +181,7 @@ WHERE
 -- ============================================
 
 -- total records
-SELECT COUNT(*) FROM raw_data;
+SELECT COUNT(*) FROM cleaned_data;
 
 SELECT * FROM cleaned_data ;
 
