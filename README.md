@@ -1,26 +1,75 @@
-# Real-Time Analysis Dashboard
+<div align="center">
 
-A real-time data streaming and analysis pipeline built with **Apache Kafka**, **Python**, and **Docker**. The system ingests, cleans, and processes data streams using a producer-consumer architecture, enabling live analytics through a continuously updated dashboard.
+<br/>
+
+```
+██████╗ ███████╗ █████╗ ██╗     ████████╗██╗███╗   ███╗███████╗
+██╔══██╗██╔════╝██╔══██╗██║        ██║   ██║████╗ ████║██╔════╝
+██████╔╝█████╗  ███████║██║        ██║   ██║██╔████╔██║█████╗  
+██╔══██╗██╔══╝  ██╔══██║██║        ██║   ██║██║╚██╔╝██║██╔══╝  
+██║  ██║███████╗██║  ██║███████╗   ██║   ██║██║ ╚═╝ ██║███████╗
+╚═╝  ╚═╝╚══════╝╚═╝  ╚═╝╚══════╝   ╚═╝   ╚═╝╚═╝     ╚═╝╚══════╝
+
+     ANALYSIS DASHBOARD  ·  Streaming Data at the Speed of Now
+```
+
+<br/>
+
+[![Python](https://img.shields.io/badge/Python-3.9%2B-3776AB?style=flat-square&logo=python&logoColor=white)](https://python.org)
+[![Apache Kafka](https://img.shields.io/badge/Apache%20Kafka-2.8%2B-231F20?style=flat-square&logo=apachekafka&logoColor=white)](https://kafka.apache.org)
+[![Docker](https://img.shields.io/badge/Docker-Compose-2496ED?style=flat-square&logo=docker&logoColor=white)](https://docker.com)
+[![Confluent](https://img.shields.io/badge/Confluent-7.4.0-CC0000?style=flat-square)](https://confluent.io)
+[![License](https://img.shields.io/badge/License-MIT-22C55E?style=flat-square)](LICENSE)
+
+<br/>
+
+*A real-time data streaming pipeline that ingests, cleans, and surfaces live analytics — built on Apache Kafka and Docker.*
+
+</div>
 
 ---
 
-## Architecture Overview
+## Overview
+
+This project implements an end-to-end **real-time analytics pipeline** using Apache Kafka as the streaming backbone. Raw data is produced to a Kafka topic, cleaned and transformed in-flight, and consumed into a downstream analytics layer — all orchestrated with Docker Compose for zero-friction local deployment.
+
+The architecture follows the classic **Producer → Kafka → Consumer** pattern, with a dedicated data-cleaning stage to ensure only well-formed records make it downstream.
+
+---
+
+## Architecture
 
 ```
-Data Source  ──►  Producer  ──►  Kafka Broker  ──►  Consumer  ──►  Dashboard
-                                      │
-                               (Zookeeper manages
-                                broker coordination)
-                                      │
-                               Cleaning Module
-                             (data preprocessing)
+┌─────────────┐        ┌──────────────────────┐        ┌─────────────────┐
+│             │        │                      │        │                 │
+│  Producer   │──────▶ │   Apache Kafka       │──────▶ │    Consumer     │
+│  (Python)   │  topic │   (Confluent 7.4.0)  │  topic │    (Python)     │
+│             │        │                      │        │                 │
+└─────────────┘        └──────────────────────┘        └─────────────────┘
+       │                        │                              │
+       │                 ┌──────┴──────┐                      │
+       │                 │  Zookeeper  │                 ┌─────▼──────┐
+       ▼                 │  (Coord.)   │                 │  Cleaning  │
+  Raw Data In            └─────────────┘                 │  (Python)  │
+                                                         └────────────┘
+                                                         Processed Data Out
 ```
 
-The pipeline consists of three main stages:
+| Component | Role |
+|-----------|------|
+| **Producer** | Reads raw data and streams it to a Kafka topic at `localhost:9092` |
+| **Kafka + Zookeeper** | Distributed message broker managing topic partitions and offsets |
+| **Cleaning** | Validates, normalises, and filters records before downstream use |
+| **Consumer** | Reads processed messages and feeds the analytics dashboard |
 
-- **Producer** — fetches or generates data and publishes messages to a Kafka topic
-- **Kafka Broker** — manages message queuing and distribution (backed by Zookeeper)
-- **Consumer** — subscribes to Kafka topics, processes/cleans incoming data, and feeds the dashboard
+---
+
+## Tech Stack
+
+- **Python 3.9+** — Producer, Consumer, and Cleaning scripts
+- **Apache Kafka 7.4.0** (Confluent) — Distributed event streaming
+- **Apache Zookeeper 7.4.0** (Confluent) — Kafka broker coordination
+- **Docker & Docker Compose** — Full local infrastructure in one command
 
 ---
 
@@ -28,34 +77,30 @@ The pipeline consists of three main stages:
 
 ```
 Real-Time-analysis-dashboard/
-├── Producer/               # Kafka producer scripts
-├── consumer/               # Kafka consumer & dashboard logic
-├── Cleaning/               # Data cleaning and preprocessing utilities
-└── docker-compose.yml      # Docker setup for Kafka + Zookeeper
+│
+├── Producer/               # Kafka producer — ingests and publishes raw data
+│   └── producer.py
+│
+├── consumer/               # Kafka consumer — reads and displays live data
+│   └── consumer.py
+│
+├── Cleaning/               # Data cleaning — validates and normalises records
+│   └── cleaning.py
+│
+└── docker-compose.yml      # Spins up Kafka + Zookeeper with one command
 ```
 
 ---
 
-## Tech Stack
-
-| Component | Technology |
-|-----------|-----------|
-| Messaging | Apache Kafka (Confluent Platform 7.4.0) |
-| Coordination | Apache Zookeeper |
-| Language | Python |
-| Containerization | Docker & Docker Compose |
-
----
-
-## Prerequisites
-
-- [Docker](https://www.docker.com/get-started) and Docker Compose installed
-- Python 3.8+
-- `pip` package manager
-
----
-
 ## Getting Started
+
+### Prerequisites
+
+Make sure the following are installed on your machine:
+
+- [Docker Desktop](https://www.docker.com/products/docker-desktop/) (includes Docker Compose)
+- Python 3.9 or higher
+- `pip` for installing Python dependencies
 
 ### 1. Clone the Repository
 
@@ -64,15 +109,15 @@ git clone https://github.com/trishita-26/Real-Time-analysis-dashboard.git
 cd Real-Time-analysis-dashboard
 ```
 
-### 2. Start Kafka and Zookeeper
+### 2. Start Kafka & Zookeeper
 
-Spin up the Kafka broker and Zookeeper using Docker Compose:
+Spin up the message broker infrastructure using Docker Compose:
 
 ```bash
 docker-compose up -d
 ```
 
-This starts:
+This launches:
 - **Zookeeper** on port `2181`
 - **Kafka broker** on port `9092`
 
@@ -85,75 +130,100 @@ docker ps
 ### 3. Install Python Dependencies
 
 ```bash
-pip install -r requirements.txt
+pip install kafka-python pandas
 ```
 
-> If a `requirements.txt` is not present, install the core dependencies manually:
-> ```bash
-> pip install confluent-kafka pandas
-> ```
+> Adjust based on your actual `requirements.txt` or imported libraries.
 
-### 4. Run the Producer
+### 4. Run the Pipeline
 
+Open **three separate terminals** and run each component:
+
+**Terminal 1 — Start the Producer:**
 ```bash
 python Producer/producer.py
 ```
 
-The producer connects to the Kafka broker at `localhost:9092` and begins publishing data to the configured topic.
+**Terminal 2 — Run the Cleaning script:**
+```bash
+python Cleaning/cleaning.py
+```
 
-### 5. Run the Consumer / Dashboard
-
+**Terminal 3 — Start the Consumer:**
 ```bash
 python consumer/consumer.py
 ```
 
-The consumer reads messages from the Kafka topic, applies cleaning logic, and updates the dashboard in real time.
+Data will begin flowing through the pipeline in real time.
 
----
-
-## Configuration
-
-| Setting | Default | Description |
-|---------|---------|-------------|
-| Kafka Bootstrap Server | `127.0.0.1:9092` | Kafka broker address |
-| Zookeeper Port | `2181` | Zookeeper client port |
-| Kafka Broker ID | `1` | Unique broker identifier |
-| Replication Factor | `1` | Topic replication (single-node setup) |
-
-To change the Kafka topic name or broker settings, update the relevant configuration in `Producer/producer.py` and `consumer/consumer.py`.
-
----
-
-## Stopping the Services
+### 5. Tear Down
 
 ```bash
 docker-compose down
 ```
 
-To also remove volumes (clears all Kafka data):
+---
 
-```bash
-docker-compose down -v
-```
+## Configuration
+
+The Kafka broker is configured in `docker-compose.yml` with the following defaults:
+
+| Parameter | Value |
+|-----------|-------|
+| Kafka Bootstrap Server | `localhost:9092` |
+| Zookeeper Port | `2181` |
+| Broker ID | `1` |
+| Confluent Version | `7.4.0` |
+| Replication Factor | `1` |
+
+To change the topic name or bootstrap server, update the corresponding variables in `producer.py` and `consumer.py`.
 
 ---
 
-## Troubleshooting
+## How It Works
 
-**Kafka connection refused** — Make sure Docker containers are fully started before running the producer/consumer. Wait a few seconds after `docker-compose up -d` before connecting.
+1. **Producer** continuously reads from a data source (CSV, API, or simulated stream) and publishes records as JSON messages to a Kafka topic.
+2. **Kafka** durably stores and routes messages, decoupling producers from consumers.
+3. **Cleaning** subscribes to the raw topic, applies validation and transformation logic, and re-publishes clean records to a processed topic.
+4. **Consumer** subscribes to the processed topic and feeds analytics or a dashboard downstream.
 
-**Messages not appearing** — Verify the producer and consumer are using the same topic name.
+This architecture ensures the pipeline is **fault-tolerant**, **scalable**, and **modular** — each component can be updated or scaled independently.
 
-**Port conflict** — If port `9092` is already in use, update the port mapping in `docker-compose.yml` and the bootstrap server address in the Python scripts.
+---
+
+## Potential Extensions
+
+- Add **Apache Spark Structured Streaming** for aggregations and windowed analytics
+- Integrate **PostgreSQL** or **InfluxDB** as a persistence layer
+- Build a live dashboard with **Grafana**, **Streamlit**, or **Superset**
+- Deploy to the cloud using **Confluent Cloud** or **AWS MSK**
+- Add **schema validation** with Confluent Schema Registry (Avro/JSON Schema)
 
 ---
 
 ## Contributing
 
-Pull requests are welcome. For significant changes, please open an issue first to discuss what you'd like to change.
+Contributions, issues, and feature requests are welcome!
+
+1. Fork the repository
+2. Create a feature branch: `git checkout -b feature/your-feature`
+3. Commit your changes: `git commit -m 'Add your feature'`
+4. Push to the branch: `git push origin feature/your-feature`
+5. Open a Pull Request
 
 ---
 
-## License
+## Author
 
-This project is open source. See [LICENSE](LICENSE) for details.
+**Trisita** — [@trishita-26](https://github.com/trishita-26)
+**Diya** — [@diya94](https://github.com/diya94)
+
+---
+
+<div align="center">
+
+*Built with curiosity and caffeine.*
+
+⭐ If this project helped you, consider giving it a star!
+
+</div>
