@@ -99,7 +99,7 @@ def run_anomaly_detection():
     print(f"      Anomalies: {total_anomalies:,} ({total_anomalies/len(df_ml)*100:.1f}%)")
 
     # ── ALERT BLOCK ──────────────────────────────────────
-    ALERT_THRESHOLD = 5.0
+    ALERT_THRESHOLD = 15.0
 
     if actual_rate > ALERT_THRESHOLD:
         print(f"\n{'!'*50}")
